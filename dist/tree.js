@@ -113,4 +113,19 @@ proto.getIndexByNodeId = function(nodeId) {
   if(index) return index;
 };
 
+proto.resetPosition = function(indexId, oldIndex) {
+  var obj = this.remove(indexId)
+  var oldParent = this.getIndex(oldIndex.parent)
+
+  if (!oldIndex.prev) { // It was the first child
+    this.insert(obj, oldParent.id, 0)
+  } else {
+  /* The index of the node in the children array is the difference between its height and the height of its parent */
+    var index = oldIndex.top - oldParent.top;
+    this.insert(obj, oldParent.id, index)
+  }
+
+  this.updateNodesPosition();
+};
+
 module.exports = Tree;

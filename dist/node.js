@@ -83,7 +83,7 @@ var Node = React.createClass({
     var nodeId = this.props.index.id;
     var dom = this.refs.inner;
 
-    if (this.props.onDragStart && !window.editingNode) {
+    if (this.props.onDragStart && !window.dragMode) {
       this.props.onDragStart(nodeId, dom, e);
     }
   }

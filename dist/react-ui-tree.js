@@ -199,6 +199,8 @@ module.exports = React.createClass({
   dragEnd: function dragEnd() {
     var tree = this.state.tree;
     var index = tree.getIndex(this.dragging.id);
+    var oldIndex = this.oldIndex;
+    var self = this;
 
     this.setState({
       dragging: {
@@ -214,14 +216,21 @@ module.exports = React.createClass({
     window.removeEventListener('mousemove', this.drag);
     window.removeEventListener('mouseup', this.dragEnd);
 
-    if (this.oldIndex.parent != index.parent) {
+    if (oldIndex.parent != index.parent) {
       var node = index.node;
       var parentId = tree.getIndex(index.parent).node.id;
 
-      console.log("We should call onParentChange");
-
       // The parent node was changed and we should update the server
-      if (this.props.onParentChange) this.props.onParentChange(node, parentId);
+      if (this.props.onParentChange) {
+        window.dragMode = true;
+        this.props.onParentChange(node, parentId, function() {
+          tree.resetPosition(index.id, oldIndex);
+          self.setState({
+            tree: tree
+          });
+          window.dragMode = false
+        });
+      }
     }
   },
   change: function change(tree) {
