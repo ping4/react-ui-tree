@@ -89,10 +89,18 @@ module.exports = React.createClass({
     );
   },
   dragStart: function dragStart(id, dom, e) {
+    var height = dom.offsetHeight;
+    if (dom.querySelector('.region')) { // This is a region
+      height -= 4 // The shadowing and padding adds 4px to the region height. This was tested in Chrome and Firefox
+      if (dom.querySelector('.region-address').innerHTML) {
+        height /= 1.6;
+      }
+    }
+
     this.dragging = {
       id: id,
       w: dom.offsetWidth,
-      h: dom.offsetHeight,
+      h: height,
       x: dom.offsetLeft,
       y: dom.offsetTop
     };
