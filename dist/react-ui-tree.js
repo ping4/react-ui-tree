@@ -273,6 +273,8 @@ module.exports = React.createClass({
         if (children.length && children.length > 0) {
           if (indexChildren && indexChildren.length > 0) {
             //remove all of the nodes inside this container
+
+            // We start from the last element because the values of the IDs change while we're removing the indexes
             for (i = indexChildren.length - 1; i >= 0; --i) {
               tree.removeNode(indexChildren[i])
             }
