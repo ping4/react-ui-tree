@@ -216,7 +216,9 @@ module.exports = React.createClass({
     window.removeEventListener('mousemove', this.drag);
     window.removeEventListener('mouseup', this.dragEnd);
 
-    if (oldIndex.parent != index.parent) {
+    if (oldIndex.parent == index.parent) {
+      tree.resetPosition(index.id, oldIndex);
+    } else {
       var node = index.node;
       var parentId = tree.getIndex(index.parent).node.id;
 
@@ -274,8 +276,8 @@ module.exports = React.createClass({
         if (children.length && children.length > 0) {
           index.children = []; //empty the children array
           index.node.children = [];
-          children.map(function(obj) {
-            tree.insert(obj, index.id, 0)
+          children.map(function(obj, i) {
+            tree.insert(obj, index.id, i)
           })
         }
         node.collapsed = false;
