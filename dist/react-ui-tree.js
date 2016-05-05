@@ -216,23 +216,19 @@ module.exports = React.createClass({
     window.removeEventListener('mousemove', this.drag);
     window.removeEventListener('mouseup', this.dragEnd);
 
-    if (oldIndex.parent == index.parent) {
-      tree.resetPosition(index.id, oldIndex);
-    } else {
-      var node = index.node;
-      var parentId = tree.getIndex(index.parent).node.id;
+    var node = index.node;
+    var parentId = tree.getIndex(index.parent).node.id;
 
-      // The parent node was changed and we should update the server
-      if (this.props.onParentChange) {
-        window.dragMode = true;
-        this.props.onParentChange(node, parentId, function() {
-          tree.resetPosition(index.id, oldIndex);
-          self.setState({
-            tree: tree
-          });
-          window.dragMode = false
+    // The parent node was changed and we should update the server
+    if (this.props.onParentChange) {
+      window.dragMode = true;
+      this.props.onParentChange(node, parentId, function() {
+        tree.resetPosition(index.id, oldIndex);
+        self.setState({
+          tree: tree
         });
-      }
+        window.dragMode = false
+      });
     }
   },
   change: function change(tree) {
@@ -273,9 +269,15 @@ module.exports = React.createClass({
     Utility.makeAjaxCall(url,
       function(data) {
         var children = data.children;
+        var indexChildren = index.children
         if (children.length && children.length > 0) {
-          index.children = []; //empty the children array
-          index.node.children = [];
+          if (indexChildren && indexChildren.length > 0) {
+            //remove all of the nodes inside this container
+            for (i = indexChildren.length - 1; i >= 0; --i) {
+              tree.removeNode(indexChildren[i])
+            }
+          }
+
           children.map(function(obj, i) {
             tree.insert(obj, index.id, i)
           })
