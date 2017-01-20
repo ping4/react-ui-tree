@@ -1,5 +1,6 @@
 'use strict';
 
+var React = require('react');
 var cx = require('classnames');
 
 var Node = React.createClass({
