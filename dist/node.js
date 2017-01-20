@@ -69,7 +69,7 @@ var Node = React.createClass({
         'div',
         { className: 'inner', ref: 'inner', onMouseDown: this.handleMouseDown },
         this.renderCollapse(),
-        tree.renderNode(index)
+        tree.renderNode(index, tree)
       ),
       this.renderChildren()
     );
