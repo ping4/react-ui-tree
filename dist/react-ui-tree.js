@@ -1,16 +1,34 @@
 'use strict';
 
-var React = require('react');
-var Tree = require('./tree');
-var Node = require('./node');
+var _react = require('react');
 
-module.exports = React.createClass({
+var _react2 = _interopRequireDefault(_react);
+
+var _createReactClass = require('create-react-class');
+
+var _createReactClass2 = _interopRequireDefault(_createReactClass);
+
+var _propTypes = require('prop-types');
+
+var _propTypes2 = _interopRequireDefault(_propTypes);
+
+var _tree = require('./tree');
+
+var _tree2 = _interopRequireDefault(_tree);
+
+var _node = require('./node');
+
+var _node2 = _interopRequireDefault(_node);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+module.exports = (0, _createReactClass2.default)({
   displayName: 'UITree',
 
   propTypes: {
-    tree: React.PropTypes.object.isRequired,
-    paddingLeft: React.PropTypes.number,
-    renderNode: React.PropTypes.func.isRequired
+    tree: _propTypes2.default.object.isRequired,
+    paddingLeft: _propTypes2.default.number,
+    renderNode: _propTypes2.default.func.isRequired
   },
 
   getDefaultProps: function getDefaultProps() {
@@ -25,7 +43,7 @@ module.exports = React.createClass({
     if (!this._updated) this.setState(this.init(nextProps));else this._updated = false;
   },
   init: function init(props) {
-    var tree = new Tree(props.tree);
+    var tree = new _tree2.default(props.tree);
     tree.isNodeCollapsed = props.isNodeCollapsed;
     tree.renderNode = props.renderNode;
     tree.changeNodeCollapsed = props.changeNodeCollapsed;
@@ -45,8 +63,11 @@ module.exports = React.createClass({
     };
   },
   getDraggingDom: function getDraggingDom() {
-    var tree = this.state.tree;
-    var dragging = this.state.dragging;
+    var _state = this.state,
+        tree = _state.tree,
+        dragging = _state.dragging;
+    var paddingLeft = this.props.paddingLeft;
+
 
     if (dragging && dragging.id) {
       var draggingIndex = tree.getIndex(dragging.id);
@@ -56,13 +77,13 @@ module.exports = React.createClass({
         width: dragging.w
       };
 
-      return React.createElement(
+      return _react2.default.createElement(
         'div',
         { className: 'm-draggable', style: draggingStyles },
-        React.createElement(Node, {
+        _react2.default.createElement(_node2.default, {
           tree: tree,
           index: draggingIndex,
-          paddingLeft: this.props.paddingLeft
+          paddingLeft: paddingLeft
         })
       );
     }
@@ -70,19 +91,22 @@ module.exports = React.createClass({
     return null;
   },
   render: function render() {
-    var tree = this.state.tree;
-    var dragging = this.state.dragging;
+    var _state2 = this.state,
+        tree = _state2.tree,
+        dragging = _state2.dragging;
+    var paddingLeft = this.props.paddingLeft;
+
     var draggingDom = this.getDraggingDom();
 
-    return React.createElement(
+    return _react2.default.createElement(
       'div',
       { className: 'm-tree' },
       draggingDom,
-      React.createElement(Node, {
+      _react2.default.createElement(_node2.default, {
         tree: tree,
         index: tree.getIndex(1),
         key: 1,
-        paddingLeft: this.props.paddingLeft,
+        paddingLeft: paddingLeft,
         onDragStart: this.dragStart,
         onCollapse: this.toggleCollapse,
         dragging: dragging && dragging.id
@@ -110,6 +134,7 @@ module.exports = React.createClass({
     window.addEventListener('mouseup', this.dragEnd);
   },
 
+
   // oh
   drag: function drag(e) {
     if (this._start) {
@@ -119,9 +144,11 @@ module.exports = React.createClass({
       this._start = false;
     }
 
-    var tree = this.state.tree;
-    var dragging = this.state.dragging;
+    var _state3 = this.state,
+        tree = _state3.tree,
+        dragging = _state3.dragging;
     var paddingLeft = this.props.paddingLeft;
+
     var newIndex = null;
     var index = tree.getIndex(dragging.id);
     var collapsed = index.node.collapsed;
@@ -176,12 +203,12 @@ module.exports = React.createClass({
           newIndex = tree.move(index.id, index.next, 'after');
         }
       } else {
-        var below = tree.getNodeByTop(index.top + index.height);
-        if (below && below.parent !== index.id) {
-          if (below.children && below.children.length) {
-            newIndex = tree.move(index.id, below.id, 'prepend');
+        var _below = tree.getNodeByTop(index.top + index.height);
+        if (_below && _below.parent !== index.id) {
+          if (_below.children && _below.children.length) {
+            newIndex = tree.move(index.id, _below.id, 'prepend');
           } else {
-            newIndex = tree.move(index.id, below.id, 'after');
+            newIndex = tree.move(index.id, _below.id, 'after');
           }
         }
       }
@@ -192,17 +219,15 @@ module.exports = React.createClass({
       dragging.id = newIndex.id;
     }
 
-    this.setState({
-      tree: tree,
-      dragging: dragging
-    });
+    this.setState({ tree: tree, dragging: dragging });
   },
   dragEnd: function dragEnd() {
     var tree = this.state.tree;
+    var onParentChange = this.props.onParentChange;
+
     var index = tree.getIndex(this.dragging.id);
     var oldIndex = this.oldIndex;
     var self = this;
-
     this.setState({
       dragging: {
         id: null,
@@ -222,14 +247,12 @@ module.exports = React.createClass({
       var parentId = tree.getIndex(index.parent).node.id;
 
       // The parent node was changed and we should update the server
-      if (this.props.onParentChange) {
+      if (onParentChange) {
         window.dragMode = true;
-        this.props.onParentChange(node, parentId, function() {
+        onParentChange(node, parentId, function () {
           tree.resetPosition(index.id, oldIndex);
-          self.setState({
-            tree: tree
-          });
-          window.dragMode = false
+          self.setState({ tree: tree });
+          window.dragMode = false;
         });
       }
     }
@@ -238,70 +261,25 @@ module.exports = React.createClass({
     this._updated = true;
     if (this.props.onChange) this.props.onChange(tree.obj);
   },
-  openNode: function(ancestors, nodeId) {
-    if (ancestors.length > 0) {
-      var region = ancestors.pop();
-      var index = this.state.tree.getIndexByNodeId(region.id);
-      this.fetchChildren(index, function() {this.openNode(ancestors, nodeId)}.bind(this));
-    } else {
-      $("#"+nodeId).click();
-    }
-  },
   toggleCollapse: function toggleCollapse(nodeId) {
     var tree = this.state.tree;
     var index = tree.getIndex(nodeId);
     var node = index.node;
     node.collapsed = !node.collapsed;
-    if (!node.collapsed && node.isParent) { // We're going to call the server so don't update the tree yet.
-      this.fetchChildren(index);
-      LocationManager.fetchRegions(node.id);
-    } else {
-      tree.updateNodesPosition();
-      this.setState({
-        tree: tree
-      });
-
-      this.change(tree);
-    }
-  },
-  fetchChildren: function(index, successCallback) {
-    var tree = this.state.tree;
-    var node = index.node;
-    var url = 'region_containers/'+node.id+'/children';
-
-    Utility.makeAjaxCall(url,
-      function(data) {
-        var children = data.children;
-        if (children.length && children.length > 0) {
-          index.children = []; //empty the children array
-          index.node.children = [];
-          children.map(function(obj) {
-            tree.insert(obj, index.id, 0)
-          })
-        }
-        node.collapsed = false;
-        tree.updateNodesPosition();
-        this.setState({
-          tree: tree
-        });
-
-        this.change(tree);
-        if(successCallback) {
-          successCallback()
-        }
-      }.bind(this),
-      function() {console.log("Ajax failed")},'GET', 'json',''
-    )
-  },
-  removeNode: function (indexId) {
-    var tree = this.state.tree;
-
-    tree.remove(indexId)
+    tree.updateNodesPosition();
 
     this.setState({
       tree: tree
     });
 
+    this.change(tree);
+  },
+  removeNode: function removeNode(indexId) {
+    var tree = this.state.tree;
+
+    tree.remove(indexId);
+
+    this.setState({ tree: tree });
     this.change(tree);
   }
 });
