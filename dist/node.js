@@ -1,19 +1,32 @@
 'use strict';
 
-var React = require('react');
-var cx = require('classnames');
+var _react = require('react');
 
-var Node = React.createClass({
+var _react2 = _interopRequireDefault(_react);
+
+var _createReactClass = require('create-react-class');
+
+var _createReactClass2 = _interopRequireDefault(_createReactClass);
+
+var _classnames = require('classnames');
+
+var _classnames2 = _interopRequireDefault(_classnames);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var Node = (0, _createReactClass2.default)({
   displayName: 'UITreeNode',
 
   renderCollapse: function renderCollapse() {
     var index = this.props.index;
 
-    if ((index.children && index.children.length) || (index.node && index.node.isParent === true)) {
+
+    if (index.children && index.children.length || index.node && index.node.isParent === true) {
       var collapsed = index.node.collapsed;
 
-      return React.createElement('span',  {
-        className: cx('nrby-tree-collapse', collapsed ? 'caret-right' : 'caret-down'),
+      var cssClasses = (0, _classnames2.default)('nrby-tree-collapse', collapsed ? 'caret-right' : 'caret-down');
+      return _react2.default.createElement('span', {
+        className: cssClasses,
         onMouseDown: function onMouseDown(e) {
           e.stopPropagation();
         },
@@ -23,30 +36,33 @@ var Node = React.createClass({
     return null;
   },
   renderChildren: function renderChildren() {
-    var _this = this;
+    var _props = this.props,
+        index = _props.index,
+        tree = _props.tree,
+        dragging = _props.dragging,
+        paddingLeft = _props.paddingLeft,
+        onCollapse = _props.onCollapse,
+        onDragStart = _props.onDragStart;
 
-    var index = this.props.index;
-    var tree = this.props.tree;
-    var dragging = this.props.dragging;
 
     if (index.children && index.children.length) {
       var childrenStyles = {};
       if (index.node.collapsed) childrenStyles.display = 'none';
       childrenStyles['paddingLeft'] = this.props.paddingLeft + 'px';
 
-      return React.createElement(
+      return _react2.default.createElement(
         'div',
         { className: 'children', style: childrenStyles },
         index.children.map(function (child) {
           var childIndex = tree.getIndex(child);
-          return React.createElement(Node, {
+          return _react2.default.createElement(Node, {
             tree: tree,
             index: childIndex,
             key: childIndex.id,
             dragging: dragging,
-            paddingLeft: _this.props.paddingLeft,
-            onCollapse: _this.props.onCollapse,
-            onDragStart: _this.props.onDragStart
+            paddingLeft: paddingLeft,
+            onCollapse: onCollapse,
+            onDragStart: onDragStart
           });
         })
       );
@@ -55,17 +71,17 @@ var Node = React.createClass({
     return null;
   },
   render: function render() {
-    var tree = this.props.tree;
-    var index = this.props.index;
-    var dragging = this.props.dragging;
-    var styles = {};
+    var _props2 = this.props,
+        tree = _props2.tree,
+        index = _props2.index,
+        dragging = _props2.dragging;
 
-    return React.createElement(
+    var cssClasses = (0, _classnames2.default)('m-node', { 'placeholder': index.id === dragging });
+
+    return _react2.default.createElement(
       'div',
-      { className: cx('m-node', {
-        'placeholder': index.id === dragging
-      }), style: styles },
-      React.createElement(
+      { className: cssClasses },
+      _react2.default.createElement(
         'div',
         { className: 'inner', ref: 'inner', onMouseDown: this.handleMouseDown },
         this.renderCollapse(),
@@ -76,16 +92,22 @@ var Node = React.createClass({
   },
   handleCollapse: function handleCollapse(e) {
     e.stopPropagation();
-    var nodeId = this.props.index.id;
-    if (this.props.onCollapse) this.props.onCollapse(nodeId);
+    var _props3 = this.props,
+        index = _props3.index,
+        onCollapse = _props3.onCollapse;
+
+    if (onCollapse) onCollapse(index.id);
   },
   handleMouseDown: function handleMouseDown(e) {
-    console.log(this);
-    var nodeId = this.props.index.id;
+    var _props4 = this.props,
+        index = _props4.index,
+        onDragStart = _props4.onDragStart;
+    // TODO: shouldn't be handling refs like this
+
     var dom = this.refs.inner;
 
-    if (this.props.onDragStart && !window.dragMode) {
-      this.props.onDragStart(nodeId, dom, e);
+    if (onDragStart && !window.dragMode) {
+      onDragStart(index.id, dom, e);
     }
   }
 });

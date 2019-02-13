@@ -5,48 +5,47 @@ var proto = Tree.prototype;
 
 proto.indexesByNodeId = {};
 
-proto.build = function(obj) {
+proto.build = function (obj) {
   var indexes = this.indexes;
   var indexesByNodeId = this.indexesByNodeId;
   var startId = this.cnt;
   var self = this;
 
-  var index = {id: startId, node: obj};
-  indexes[this.cnt+''] = index;
-  indexesByNodeId[obj.id+''] = index;
+  var index = { id: startId, node: obj };
+  indexes[this.cnt + ''] = index;
+  indexesByNodeId[obj.id + ''] = index;
   this.cnt++;
 
-  if(obj.children && obj.children.length) walk(obj.children, index);
+  if (obj.children && obj.children.length) walk(obj.children, index);
 
   function walk(objs, parent) {
     var children = [];
-    objs.forEach(function(obj, i) {
+    objs.forEach(function (obj, i) {
       var index = {};
       index.id = self.cnt;
       index.node = obj;
 
-      if(parent) index.parent = parent.id;
+      if (parent) index.parent = parent.id;
 
-      indexes[self.cnt+''] = index;
-      indexesByNodeId[obj.id+''] = index;
+      indexes[self.cnt + ''] = index;
+      indexesByNodeId[obj.id + ''] = index;
       children.push(self.cnt);
       self.cnt++;
 
-      if(obj.children && obj.children.length) walk(obj.children, index);
+      if (obj.children && obj.children.length) walk(obj.children, index);
     });
     parent.children = children;
 
-    children.forEach(function(id, i) {
-      var index = indexes[id+''];
-      if(i > 0) index.prev = children[i-1];
-      if(i < children.length-1) index.next = children[i+1];
+    children.forEach(function (id, i) {
+      var index = indexes[id + ''];
+      if (i > 0) index.prev = children[i - 1];
+      if (i < children.length - 1) index.next = children[i + 1];
     });
   }
 
-  console.log("index", index)
+  console.log("index", index);
   return index;
 };
-
 
 proto.updateNodesPosition = function () {
   var top = 1;
@@ -108,21 +107,22 @@ proto.getNodeByTop = function (top) {
   }
 };
 
-proto.getIndexByNodeId = function(nodeId) {
-  var index = this.indexesByNodeId[nodeId+''];
-  if(index) return index;
+proto.getIndexByNodeId = function (nodeId) {
+  var index = this.indexesByNodeId[nodeId + ''];
+  if (index) return index;
 };
 
-proto.resetPosition = function(indexId, oldIndex) {
-  var obj = this.remove(indexId)
-  var oldParent = this.getIndex(oldIndex.parent)
+proto.resetPosition = function (indexId, oldIndex) {
+  var obj = this.remove(indexId);
+  var oldParent = this.getIndex(oldIndex.parent);
 
-  if (!oldIndex.prev) { // It was the first child
-    this.insert(obj, oldParent.id, 0)
+  if (!oldIndex.prev) {
+    // It was the first child
+    this.insert(obj, oldParent.id, 0);
   } else {
-  /* The index of the node in the children array is the difference between its height and the height of its parent */
+    /* The index of the node in the children array is the difference between its height and the height of its parent */
     var index = oldIndex.top - oldParent.top;
-    this.insert(obj, oldParent.id, index)
+    this.insert(obj, oldParent.id, index);
   }
 
   this.updateNodesPosition();
