@@ -43,7 +43,6 @@ proto.build = function (obj) {
     });
   }
 
-  console.log("index", index);
   return index;
 };
 
