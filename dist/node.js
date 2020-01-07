@@ -83,7 +83,7 @@ var Node = (0, _createReactClass2.default)({
       { className: cssClasses },
       _react2.default.createElement(
         'div',
-        { className: 'inner', ref: 'inner', onMouseDown: this.handleMouseDown },
+        { className: 'inner', onMouseDown: this.handleMouseDown },
         this.renderCollapse(),
         tree.renderNode(index, tree)
       ),
@@ -102,12 +102,10 @@ var Node = (0, _createReactClass2.default)({
     var _props4 = this.props,
         index = _props4.index,
         onDragStart = _props4.onDragStart;
-    // TODO: shouldn't be handling refs like this
 
-    var dom = this.refs.inner;
 
     if (onDragStart && !window.dragMode) {
-      onDragStart(index.id, dom, e);
+      onDragStart(index.id, e.target, e);
     }
   }
 });
